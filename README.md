@@ -1,6 +1,6 @@
 # Kaleidoscope
 
-This project uses OpenAI's gpt-4o model to generate image variations.
+This project uses Google's Gemini 2.0 Flash Preview Image Generation model to generate image variations.
 
 ## Installation
 
@@ -12,10 +12,12 @@ This project uses OpenAI's gpt-4o model to generate image variations.
    ```bash
    pip install -r requirements.txt
    ```
-3. Set up your environment variables by creating a `.env` file with your OpenAI API key:
+3. Set up your environment variables by creating a `.env` file with your Google API key:
    ```
-   OPENAI_API_KEY=your-api-key
+   GOOGLE_API_KEY=your_google_api_key_here
    ```
+
+Note: You can obtain a Google API key from the [Google AI Studio](https://aistudio.google.com/) console.
 
 ## Usage
 

@@ -1,66 +1,50 @@
 import argparse
-import base64
 import os
-from openai import OpenAI
+import google.generativeai as genai
 from dotenv import load_dotenv
+import PIL.Image
 
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-
-def encode_image(image_path):
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode("utf-8")
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
 def generate_image_variation(image_path, iteration):
     """
-    Generates an image variation using the OpenAI gpt-4.1 model.
+    Generates an image variation using the Google Gemini 2.0 Flash Preview Image Generation model.
     """
     print(f"Generating variation {iteration} from {image_path}...")
-    base64_image = encode_image(image_path)
-    prompt = "Recreate this image"
+    
+    prompt = "Recreate this image with slight variations while maintaining the core composition and style"
 
     try:
-        response = client.responses.create(
-            model="gpt-4o",
-            input=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "input_text", "text": prompt},
-                        {
-                            "type": "input_image",
-                            "image_url": f"data:image/png;base64,{base64_image}",
-                        },
-                    ],
-                }
-            ],
-            tools=[{"type": "image_generation"}],
-        )
-
-        image_generation_calls = [
-            output
-            for output in response.output
-            if output.type == "image_generation_call"
-        ]
-
-        if image_generation_calls:
-            image_base64 = image_generation_calls[0].result
-            new_image_path = f"outputs/variation_{iteration}.png"
-            with open(new_image_path, "wb") as f:
-                f.write(base64.b64decode(image_base64))
-            return new_image_path
+        # Load the image
+        image = PIL.Image.open(image_path)
+        
+        # Use the Gemini model that supports image generation
+        model = genai.GenerativeModel("gemini-2.0-flash-preview-image-generation")
+        
+        response = model.generate_content([prompt, image])
+        
+        # Check if response has image data
+        if hasattr(response, 'candidates') and response.candidates:
+            candidate = response.candidates[0]
+            if hasattr(candidate, 'content') and candidate.content.parts:
+                for part in candidate.content.parts:
+                    if hasattr(part, 'inline_data') and part.inline_data:
+                        # Save the generated image
+                        new_image_path = f"outputs/variation_{iteration}.png"
+                        with open(new_image_path, "wb") as f:
+                            f.write(part.inline_data.data)
+                        return new_image_path
+        
+        # If no image data found, check for text response
+        if response.text:
+            print(f"Model response: {response.text}")
+            raise Exception("Model did not generate an image, only text response.")
         else:
-            # Look for text content if image generation failed
-            text_content = [
-                output.text for output in response.output if output.type == "text"
-            ]
-            if text_content:
-                raise Exception(f"Image generation failed: {text_content[0]}")
-            else:
-                raise Exception("Image generation failed. No image data in response.")
+            raise Exception("Image generation failed. No image data in response.")
+            
     except Exception as e:
         print(f"An error occurred: {e}")
         raise
@@ -68,7 +52,7 @@ def generate_image_variation(image_path, iteration):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate image variations using OpenAI's gpt-4.1 model."
+        description="Generate image variations using Google's Gemini 2.0 Flash Preview Image Generation model."
     )
     parser.add_argument("image_path", type=str, help="The path to the initial image.")
     parser.add_argument("count", type=int, help="The number of variations to generate.")

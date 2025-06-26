@@ -25,10 +25,27 @@ Run the `main.py` script with the path to the initial image and the number of va
 python main.py <image_path> <count>
 ```
 
-For example:
+### Examples
 
 ```bash
-python main.py images/test.png 5
+# Generate 5 variations of a local image
+python main.py outputs/test.png 5
+
+# Generate 3 variations of any image file
+python main.py /path/to/your/photo.jpg 3
+
+# Quick test run (uses predefined example)
+make run
 ```
 
-This will generate 5 variations of the `test.png` image and save them in the `images` directory.
+### Available Make Commands
+
+```bash
+make help     # Show all available commands
+make install  # Install dependencies
+make run      # Run example with outputs/test.png and 3 variations
+make lint     # Run code linting
+make format   # Format code
+```
+
+Generated variations will be saved in the `outputs` directory with timestamps.

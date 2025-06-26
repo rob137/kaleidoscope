@@ -48,7 +48,7 @@ def generate_image_variation(image_path, iteration):
 
         if image_generation_calls:
             image_base64 = image_generation_calls[0].result
-            new_image_path = f"images/variation_{iteration}.png"
+            new_image_path = f"outputs/variation_{iteration}.png"
             with open(new_image_path, "wb") as f:
                 f.write(base64.b64decode(image_base64))
             return new_image_path
@@ -74,8 +74,8 @@ def main():
     parser.add_argument("count", type=int, help="The number of variations to generate.")
     args = parser.parse_args()
 
-    if not os.path.exists("images"):
-        os.makedirs("images")
+    if not os.path.exists("outputs"):
+        os.makedirs("outputs")
 
     current_image_path = args.image_path
     for i in range(args.count):

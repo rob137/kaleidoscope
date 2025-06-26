@@ -55,9 +55,7 @@ def generate_image_variation(image_path, iteration):
         else:
             # Look for text content if image generation failed
             text_content = [
-                output.text
-                for output in response.output
-                if output.type == "text"
+                output.text for output in response.output if output.type == "text"
             ]
             if text_content:
                 raise Exception(f"Image generation failed: {text_content[0]}")
@@ -73,9 +71,7 @@ def main():
         description="Generate image variations using OpenAI's gpt-4.1 model."
     )
     parser.add_argument("image_path", type=str, help="The path to the initial image.")
-    parser.add_argument(
-        "count", type=int, help="The number of variations to generate."
-    )
+    parser.add_argument("count", type=int, help="The number of variations to generate.")
     args = parser.parse_args()
 
     if not os.path.exists("images"):

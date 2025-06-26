@@ -7,3 +7,6 @@ __pycache__/
 
 # Generated images
 /images/generated/
+
+# macOS system files
+.DS_Store
